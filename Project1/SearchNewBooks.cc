@@ -3,6 +3,8 @@
 #include<fstream>
 #include<string>
 #include<vector>
+#include<algorithm>
+#include<sstream>
 using namespace std;
 
 class Book {
@@ -21,7 +23,7 @@ class Book {
 
 
 // Overload << to print Book objects nicely
-ostream& operator<< (ostream& os, Book book){
+ostream& operator<< (ostream& os, Book& book){
     os << book.isbn << ", " << book.lang << ", " << book.type << endl;
     return os;
 }
@@ -99,6 +101,48 @@ vector<Book> parse_data (ifstream& file){
 
 
 
+// Overload `<` for sorting
+bool operator< (Book& b1, Book& b2){
+
+    // Convert string ISBN to integers (otherwise)
+    // will sort only by first digit
+    int isbn1, isbn2;
+    istringstream(b1.isbn) >> isbn1;
+    istringstream(b2.isbn) >> isbn2;
+    
+    if (isbn1 < isbn2){
+        return true;
+    }
+    else if (b1.isbn == b2.isbn){
+
+        if (b1.type == "new" && b2.type == "old")
+            return true;
+        else if(b1.type == "new" && b2.type == "digital")
+            return true;
+        
+
+        else if (b1.type == "old" && b2.type == "digital")
+            return true;
+
+
+        else if (b2.type == "new" && b1.type == "old")
+            return false;
+        else if(b2.type == "new" && b1.type == "digital")
+            return false;
+        else if (b2.type == "old" && b1.type == "digital")
+            return false;
+        else if (b2.type == b1.type)
+            return b1.lang < b2.lang;
+        else
+            return false;
+        
+    }
+    else
+        return false;
+}
+
+
+
 
 
 
@@ -137,15 +181,18 @@ int main(int argc, char* argv[]){
     requestFile.close();
 
         
-    cout << "Book List: " << endl << bookList << endl;
-    cout << "Requested Books: " << endl << requestList << endl;
+    cout << "Book List: " << endl << bookList << endl;              // check
+    cout << "Requested Books: " << endl << requestList << endl;     // check
 
     //--------------- SORT THE BOOK LIST -----------------------------
+
+    sort(bookList.begin(), bookList.end());
+
+    for (Book b : bookList){
+        cout << b << endl;                                          // check
+    }
     
-
-
-
-
+    //------- IMPLEMENT SEARCHING FUNCTIONS AND PROMPT USER (SWITCH CASE)------
     
 
 
@@ -154,7 +201,3 @@ int main(int argc, char* argv[]){
 }
 
 
-
-/* Need to:
-    - read files into a vector (or one vector per line?)
-    - call Book constructor on each line and append it to the vector?*/
