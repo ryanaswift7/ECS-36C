@@ -5,7 +5,10 @@
 #include<vector>
 #include<algorithm>
 #include<sstream>
+#include <chrono> //NOLINT (build/c++11)
 using namespace std;
+
+
 
 class Book {
     public:
@@ -18,6 +21,29 @@ class Book {
         }
 
 };
+
+
+// Overload == for searching comparisons
+bool operator== (Book& b1, Book& b2){
+    if (b1.isbn == b2.isbn && b1.lang == b2.lang && b1.type == b2.type)
+        return true;
+
+    else
+        return false;
+}
+
+
+
+// Function to find the index of the last element in a Book vector
+int lastIndex (vector<Book>& list){
+    int counter = 0;
+    for (Book& b : list){
+        if (b == b){        // would not compile if b was not used in some way
+            counter++;
+        }
+    }
+    return counter - 1; // the first Book is at index 0
+}
 
 
 
@@ -146,6 +172,223 @@ bool operator< (Book& b1, Book& b2){
 
 
 
+
+
+
+// Function for writing result of searches to found.dat
+void writeResultFile (int num, string& filename){
+    ofstream outputFile;
+    outputFile.open(filename);
+    outputFile << num;
+    outputFile.close();
+}
+
+
+
+
+
+
+int linearSearch (vector<Book>& available, vector<Book>& requested){
+
+   //----------------- START THE CLOCK --------------------------
+    std::chrono::high_resolution_clock::time_point start;
+    start = std::chrono::high_resolution_clock::now();
+
+    // Counter to hold number of books found
+    int found = 0;
+
+    for (Book& b_req : requested){    
+        for (Book& b_avail : available){
+            if (b_req == b_avail){
+                found++;
+                break;
+            }
+        }
+    }
+//--------------------- STOP THE CLOCK ------------------------
+    auto end = std::chrono::high_resolution_clock::now();
+    double elapsed_us = std::chrono::duration<double, std::micro>(end - start).count();
+    std::cout << "CPU time: " << elapsed_us << " microseconds" << endl;
+
+
+    return found;
+}
+
+
+
+
+int binarySearch(vector<Book>& available, vector<Book>& requested) {
+
+//----------------- START THE CLOCK --------------------------
+    std::chrono::high_resolution_clock::time_point start;
+    start = std::chrono::high_resolution_clock::now();
+
+
+    // First, sort the list of available books
+    sort(available.begin(), available.end());     
+    
+    
+    // Now implement binary search algo
+    int found = 0;     // counter
+
+    for (Book& b : requested){
+        int left = 0;
+        int right = lastIndex(available);
+        while (left <= right){
+
+            int mid = (left + right) / 2;
+
+            
+            if (b == available[mid]){
+                found++;
+                break;
+            }
+
+            else if ((stoi(b.isbn) < stoi(available[mid].isbn)) || (b.lang < available[mid].lang) || (b.type < available[mid].type)){
+                right = mid - 1;
+            }
+
+            else if ((stoi(b.isbn) > stoi(available[mid].isbn)) || (b.lang > available[mid].lang) || (b.type > available[mid].type)){
+                left = mid + 1;
+            }
+            else {
+                cout << "i brokey" << endl;
+                break;
+            }
+
+        }
+    }
+
+
+    //--------------------- STOP THE CLOCK ------------------------
+    auto end = std::chrono::high_resolution_clock::now();
+    double elapsed_us = std::chrono::duration<double, std::micro>(end - start).count();
+    std::cout << "CPU time: " << elapsed_us << " microseconds" << endl;
+
+
+
+
+    return found;
+
+}
+
+
+
+
+bool recursiveBinarySearch(vector<Book>& available, Book& b, int l, int r) {
+
+    //int found = counter;
+    int left = l;
+    int right = r;
+
+    if (left <= right){
+        int mid = (left + right) / 2;
+
+        if (b == available[mid]){
+            return true;
+        }
+
+        else if ((stoi(b.isbn) < stoi(available[mid].isbn)) || (b.lang < available[mid].lang) || (b.type < available[mid].type)){
+            return recursiveBinarySearch(available, b, left, mid - 1);
+        }
+
+        else if ((stoi(b.isbn) > stoi(available[mid].isbn)) || (b.lang > available[mid].lang) || (b.type > available[mid].type)){
+            return recursiveBinarySearch(available, b, mid + 1, right);
+        }
+
+        else {
+            cout << "i brokey" << endl;
+            return false;
+        }
+
+    }
+
+    return false;
+}
+
+
+
+
+
+
+
+void search(vector<Book>& available, vector<Book>& requested, string& outputFile){
+
+    char searchType;
+    cout << "Choice of search method ([l]inear, [b]inary, [r]ecursiveBinary)?" << endl;
+    cin >> searchType;
+
+    while (!((searchType == 'l') || (searchType == 'b') || (searchType == 'r'))){
+        // Inform user of invalid response and reprompt
+        cout << "Incorrect choice" << endl;
+        cin >> searchType;
+    }
+
+    if (searchType == 'l'){
+            // Implement linear search and write results to found.dat
+            writeResultFile(linearSearch(available, requested), outputFile);
+            return;
+    }
+
+    else if (searchType == 'b'){
+            // Implement non-recursive binary search and write results to found.dat
+            writeResultFile(binarySearch(available, requested), outputFile);
+            return;
+    }
+    else if (searchType == 'r'){
+
+            //----------------- START THE CLOCK --------------------------
+            std::chrono::high_resolution_clock::time_point start;
+            start = std::chrono::high_resolution_clock::now();
+
+
+            // Need to first sort the available list outside of the
+            // recursive function, or it will waste time trying
+            // to sort it at each subsequent call
+            sort(available.begin(), available.end());     
+    
+            // Initialize counter
+            int found = 0;
+
+            // Then need to store the size of the available vector to find its
+            // rightmost index
+            int right = lastIndex(available);
+
+
+            // Need to implement recursion for each requested book
+            // If a book is found, increment the counter
+            for (Book& b : requested){
+                if (recursiveBinarySearch(available, b, 0, right) == true){
+                    found++;
+                }
+            }
+
+
+            //--------------------- STOP THE CLOCK ------------------------
+            auto end = std::chrono::high_resolution_clock::now();
+            double elapsed_us = std::chrono::duration<double, std::micro>(end - start).count();
+            std::cout << "CPU time: " << elapsed_us << " microseconds" << endl;
+
+
+
+            // Implement recursive binary search and write results to found.dat
+            writeResultFile(found, outputFile);
+
+            return;
+    }
+    
+
+}
+
+
+
+
+
+//------------------- BEGINNING OF MAIN FUNCTION ------------------------------------------------------
+
+
+
+
 int main(int argc, char* argv[]){
 
     //-------------- MAKE SURE THE ARGUMENTS AREN'T BORKED -----------------------------
@@ -154,17 +397,23 @@ int main(int argc, char* argv[]){
         cerr << "Usage: .SearchNewBooks <newBooks.dat> <request.dat> <result_file.dat>" << endl;
     }
 
-    
+    // Change default output file, if specified
+    string outputFile = "found.dat";
+    if (argc == 4){
+        outputFile = argv[3];
+    }
+
+    //--------------------- READ IN DATA FROM FILES -------------------------
+
     // Read first file from cli as the book list
     ifstream bookListFile(argv[1]);
 
 
-    // Catch exception if file not found
+    // Catch error if file not found
     if (!bookListFile){
-        cerr << "Error opening file" << endl;
+        cerr << "Error: cannot open file " << argv[1] << endl;
     }
 
-    //--------------------- READ IN DATA FROM FILES -------------------------
 
     // Create a Book vector to store the all of the Books
     vector<Book> bookList = parse_data(bookListFile);
@@ -175,28 +424,22 @@ int main(int argc, char* argv[]){
 
     ifstream requestFile(argv[2]);
 
+    // Catch error if file not found
+    if (!requestFile){
+        cerr << "Error: cannot open file " << argv[2] << endl;
+    }
+
     // Create a Book vector to store the requested books
     vector<Book> requestList = parse_data(requestFile);
 
     requestFile.close();
 
-        
-    cout << "Book List: " << endl << bookList << endl;              // check
-    cout << "Requested Books: " << endl << requestList << endl;     // check
-
-    //--------------- SORT THE BOOK LIST -----------------------------
-
-    sort(bookList.begin(), bookList.end());
-
-    for (Book b : bookList){
-        cout << b << endl;                                          // check
-    }
-    
-    //------- IMPLEMENT SEARCHING FUNCTIONS AND PROMPT USER (SWITCH CASE)------
-    
+     
+    //------- DO ALL THE THINGS ------
+   
+    search(bookList, requestList, outputFile);
 
 
-    
     return 0;
 }
 
