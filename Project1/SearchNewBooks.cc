@@ -395,6 +395,7 @@ int main(int argc, char* argv[]){
     
     if (argc != 3 && argc != 4){
         cerr << "Usage: .SearchNewBooks <newBooks.dat> <request.dat> <result_file.dat>" << endl;
+        return 0;
     }
 
     // Change default output file, if specified
@@ -412,6 +413,7 @@ int main(int argc, char* argv[]){
     // Catch error if file not found
     if (!bookListFile){
         cerr << "Error: cannot open file " << argv[1] << endl;
+        return 0;
     }
 
 
@@ -427,6 +429,7 @@ int main(int argc, char* argv[]){
     // Catch error if file not found
     if (!requestFile){
         cerr << "Error: cannot open file " << argv[2] << endl;
+        return 0;
     }
 
     // Create a Book vector to store the requested books
