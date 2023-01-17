@@ -238,24 +238,35 @@ int binarySearch(vector<Book>& available, vector<Book>& requested) {
 
             int mid = (left + right) / 2;
 
-            
             if (b == available[mid]){
                 found++;
                 break;
             }
 
-            else if ((stoi(b.isbn) < stoi(available[mid].isbn)) || (b.lang < available[mid].lang) || (b.type < available[mid].type)){
+            else if (stoi(b.isbn) < stoi(available[mid].isbn)) { 
                 right = mid - 1;
             }
 
-            else if ((stoi(b.isbn) > stoi(available[mid].isbn)) || (b.lang > available[mid].lang) || (b.type > available[mid].type)){
+            else if (stoi(b.isbn) > stoi(available[mid].isbn)){
                 left = mid + 1;
             }
-            else {
-                cout << "i brokey" << endl;
-                break;
-            }
 
+            else if (stoi(b.isbn) == stoi(available[mid].isbn)){
+                if (b.lang < available[mid].lang){
+                    right = mid - 1;
+                }
+                else if (b.lang > available[mid].lang){
+                    left = mid + 1;
+                }
+                else if (b.lang == available[mid].lang){
+                    if (b.type < available[mid].type){
+                        right = mid - 1;
+                    }
+                    else if (b.type > available[mid].type){
+                        left = mid + 1;
+                    }
+                }
+            }
         }
     }
 
@@ -282,23 +293,37 @@ bool recursiveBinarySearch(vector<Book>& available, Book& b, int l, int r) {
     int right = r;
 
     if (left <= right){
+        
         int mid = (left + right) / 2;
+            
 
         if (b == available[mid]){
             return true;
         }
 
-        else if ((stoi(b.isbn) < stoi(available[mid].isbn)) || (b.lang < available[mid].lang) || (b.type < available[mid].type)){
+        else if (stoi(b.isbn) < stoi(available[mid].isbn)) {
             return recursiveBinarySearch(available, b, left, mid - 1);
         }
 
-        else if ((stoi(b.isbn) > stoi(available[mid].isbn)) || (b.lang > available[mid].lang) || (b.type > available[mid].type)){
+        else if (stoi(b.isbn) > stoi(available[mid].isbn)) {
             return recursiveBinarySearch(available, b, mid + 1, right);
         }
 
-        else {
-            cout << "i brokey" << endl;
-            return false;
+        else if (stoi(b.isbn) == stoi(available[mid].isbn)) {
+            if (b.lang < available[mid].lang){
+                return recursiveBinarySearch(available, b, left, mid - 1);
+            }
+            else if (b.lang > available[mid].lang){
+                return recursiveBinarySearch(available, b, mid + 1, right);
+            }
+            else if (b.lang == available[mid].lang){
+                if (b.type < available[mid].type){
+                    return recursiveBinarySearch(available, b, left, mid - 1);
+                }
+                else if (b.type > available[mid].type){
+                    return recursiveBinarySearch(available, b, mid + 1, right);
+                }
+            }
         }
 
     }
