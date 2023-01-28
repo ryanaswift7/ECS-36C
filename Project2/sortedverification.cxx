@@ -24,14 +24,14 @@ int main(int argc, char** argv) {
      }
 
      nlohmann::json data = nlohmann::json::parse(file); // pull the info out of the file
-     
-     const int NUM_SAMPLES = data["metadata"]["numSamples"]; // get number of samples in 
-     int len = data["metadata"]["arraySize"]; // get length of samples (only works if all same size)
      nlohmann::json j_out; // create JSON to be output
+     
      j_out["metadata"]["arraySize"] = data["metadata"]["arraySize"]; // copy arraySize into output JSON
      j_out["metadata"]["numSamples"] = data["metadata"]["numSamples"]; // copy numSamples into output JSON
      j_out["metadata"]["file"] = argv[1]; // include filename
+
      int inversions = 0; // create counter for number of samples with consecutive inversions
+     int len = data["metadata"]["arraySize"]; // get length of samples (only works if all same size)
 
      for (auto itr = data.begin(); itr != data.end(); ++itr){    // iterate over keys
           bool sampleHasInversion = false; // will change to true if sample has at least 1 inversion
@@ -51,12 +51,10 @@ int main(int argc, char** argv) {
           if (sampleHasInversion){
                inversions++;
           }
-          
      }
-
+     
      j_out["metadata"]["samplesWithInversions"] = inversions;
      file.close(); // close file
      std::cout << j_out.dump(2) << std::endl;
      return 0;
-
 }
