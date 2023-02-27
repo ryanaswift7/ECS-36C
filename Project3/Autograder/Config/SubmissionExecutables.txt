@@ -1,2 +1,0 @@
-buildheap.exe
-createteams.exe

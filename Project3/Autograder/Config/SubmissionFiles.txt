@@ -1,5 +1,0 @@
-Makefile
-buildheap.cxx
-createteams.cxx
-priorityqueue.cpp
-priorityqueue.h
