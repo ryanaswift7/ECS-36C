@@ -1,0 +1,11 @@
+Sample,InsertionSortTime,InsertionSortCompares,InsertionSortMemaccess,MergeSortTime,MergeSortCompares,MergeSortMemaccess,QuickSortTime,QuickSortCompares,QuickSortMemaccess
+Sample01,1.16,29,150,5.902,24,184,1.789,53,98
+Sample02,0.963,33,174,4.274,22,180,1.274,48,85
+Sample03,0.808,29,146,3.819,22,180,1.308,51,100
+Sample04,0.869,30,148,3.869,24,184,1.242,50,91
+Sample05,0.687,29,138,4.131,24,184,1.343,60,93
+Sample06,0.938,32,168,4.281,21,178,1.266,55,96
+Sample07,0.684,26,124,4.012,24,184,1.276,54,103
+Sample08,0.986,36,196,3.769,20,176,1.146,49,86
+Sample09,0.641,22,100,4.067,22,180,1.119,53,94
+Sample10,0.978,37,206,3.847,22,180,1.333,50,87
